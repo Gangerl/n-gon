@@ -1,0 +1,35 @@
+#!/usr/bin/gawk -f
+
+# Number of ways to color edges of a n-gon using c colors, allowing only rotations
+# Wolfgang Lauffher 2024
+
+function determine_stones (edge_depth,     c, e, r) {
+        local colors
+        local counted
+        for (c=1; c<=COLORS; c++) {
+                Color[edge_depth]=c
+                if (edge_depth > 1) {
+                        determine_stones(edge_depth-1)
+                }
+                else {
+                        counted=0
+                        for (r=1; r<=EDGES; r++) { # Rotations
+                                colors="#"
+                                for (e=r; e<=EDGES+r-1; e++) {
+                                        colors=colors " " Color[(e-1) % EDGES +1]
+                                }
+                                if (++Seen[colors]==1 && !counted++) COUNT++
+                        }
+                }
+        }
+}
+
+BEGIN {
+        EDGES=ARGV[1] ? ARGV[1] : 1
+        COLORS=ARGV[2] ? ARGV[2] : 1
+
+        determine_stones(EDGES)
+
+        print "EDGES: " EDGES " COLORS: " COLORS "   Different Stones: " COUNT
+}
+
