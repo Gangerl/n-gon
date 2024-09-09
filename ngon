@@ -3,23 +3,23 @@
 # Number of ways to color edges of a n-gon using c colors, allowing only rotations
 # Wolfgang Lauffher 2024
 
-function determine_stones (edge_depth,     c, e, r) {
+function find_unique_colorings (edges,     c, e, r) {
         local colors
-        local counted
+        local counted_within_this_rotation
         for (c=1; c<=COLORS; c++) {
-                Color[edge_depth]=c
-                if (edge_depth > 1) {
-                        determine_stones(edge_depth-1)
-                }
-                else {
-                        counted=0
-                        for (r=1; r<=EDGES; r++) { # Rotations
+                Color[edges]=c
+                if (edges <= 1) {
+                        counted_within_this_rotation=0
+                        for (r=1; r<=EDGES; r++) { # Rotation
                                 colors="#"
                                 for (e=r; e<=EDGES+r-1; e++) {
                                         colors=colors " " Color[(e-1) % EDGES +1]
                                 }
-                                if (++Seen[colors]==1 && !counted++) COUNT++
+                                if (++Seen[colors]==1 && !counted_within_this_rotation++) COLORINGS++
                         }
+                }
+                else {
+                        find_unique_colorings(edges-1)
                 }
         }
 }
@@ -28,8 +28,9 @@ BEGIN {
         EDGES=ARGV[1] ? ARGV[1] : 1
         COLORS=ARGV[2] ? ARGV[2] : 1
 
-        determine_stones(EDGES)
+        find_unique_colorings(EDGES)
 
-        print "EDGES: " EDGES " COLORS: " COLORS "   Different Stones: " COUNT
+        print "Edges: " EDGES " Colors: " COLORS " Unique Colorings: " COLORINGS
 }
+
 
